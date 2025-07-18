@@ -15,7 +15,9 @@ Es arte que se crea a partir de un proceso con reglas definidas con tal de mater
 ### Actividad 3  
 En este sistemas físico interactivo identifica los inputs, outputs y el proceso.  
 Input: Computador 1(Web Serial/puerto USB, boton "Send Love") y Computador 2 (Botones(A/B), Acelerometro, puerto USB) 
-Output: Computador 1(Pantalla, Web Serial(datos)) y Computador 2 (puerto USB(datos), Pantalla())   
-Proceso:Computador 1 (presionar boton "Send Love"()) y Computador 2 (presionar boton A (genera color rojo + mostrar letra "A")/boton B(genera color amarillo + mostrar letra "B"), agitar Acelerometro(genera color verde))  
-
+Output: Computador 1(Pantalla, Web Serial(datos)) y Computador 2 (puerto USB(datos), Pantalla)   
+Proceso:Computador 1 (presionar boton "Send Love"(mostrar corazon -> cara feliz)) y Computador 2 (presionar boton A (generar color rojo + mostrar letra "A")/boton B(generar color amarillo + mostrar letra "B"), agitar Acelerometro(generar color verde))  
   
+### Actividad 4  
+Crear programa en p5.js 
+[My Ride](https://editor.p5js.org/RonEduPraGar/sketches/i-uNj39De) 
