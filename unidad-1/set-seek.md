@@ -16,6 +16,6 @@ Es arte que se crea a partir de un proceso con reglas definidas con tal de mater
 En este sistemas físico interactivo identifica los inputs, outputs y el proceso.  
 Input: Computador 1(Web Serial/puerto USB, boton "Send Love") y Computador 2 (Botones(A/B), Acelerometro, puerto USB) 
 Output: Computador 1(Pantalla, Web Serial(datos)) y Computador 2 (puerto USB(datos), Pantalla())   
-Proceso:Computador 1 () y Computador 2 (presionar)  
+Proceso:Computador 1 (presionar boton "Send Love"()) y Computador 2 (presionar boton A (genera color rojo + mostrar letra "A")/boton B(genera color amarillo + mostrar letra "B"), agitar Acelerometro(genera color verde))  
 
   
