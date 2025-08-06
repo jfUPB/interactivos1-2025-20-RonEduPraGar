@@ -63,3 +63,12 @@ for i in range (3):
 Esencialmente tiene los mismos eventos y estados del punto anterior.
 En un semaforo, estados (espera -> tiempo, accion -> cambio color)  
 El unico cambio es que en vez de un solo ciclo while, se usan 3 ciclos separados para que no se cruzen los intervalos de los leds, lo cual lleva a que solo funcione una vez el programa debido a mi falta de tiempo y entendimiento del funcionamiento de python para corregir que el programa no ejecute el ultimo ciclo del 3er pixel bajo el ciclo While, cosa que desalinea todo el semaforo.  
+  
+### Actividad 3
+#### Explica por qué decimos que este programa permite realizar de manera concurrente varias tareas.
+Este programa realiza tareas de forma concurrente ya que es capaz de continuar su ciclo base entre las expresiones a la vez que permite llamar a los estados que contienen a estas expresiones en cualquier momento, unicamente cambiando el contexto sobre el cual se muestra la expresion opuesta de la que este en display en el momento (feliz -> triste, triste -> feliz y sonrie -> feliz, siendo la excepcion de que cambia al opuesto).  
+  
+#### Identifica los estados, eventos y acciones en el programa.  
+4 Estados. Inicial, feliz, sonrisa y triste.  
+2 Eventos. Presionar boton A y tiempo de espera.  
+Acciones. Cambio a feliz, cambio a sonrisa y cambio a triste.  
