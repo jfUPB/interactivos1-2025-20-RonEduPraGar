@@ -7,8 +7,7 @@
 El programa define una accion asignable a diferentes posiciones del display  
   
 #### ¿Cuáles son los estados en el programa?  
-2 estados init y waittimeout, (init es pseudoestado). Estados de: espera, accion
-En un semaforo, estados (espera -> tiempo, accion -> cambio color)  
+2 estados init y waittimeout, (init es pseudoestado). Estados de: espera, accion  
   
 #### ¿Cuáles son los eventos/inputs en el programa?  
 Hay un evento en waittimeout (tiempo), cuando se cumple este evento se enciende o se apaga el pixel/led asociado.  
@@ -59,3 +58,8 @@ for i in range (3):
     pixel2.update()  
 for i in range (3):
     pixel3.update()    
+  
+
+Esencialmente tiene los mismos eventos y estados del punto anterior.
+En un semaforo, estados (espera -> tiempo, accion -> cambio color)  
+El unico cambio es que en vez de un solo ciclo while, se usan 3 ciclos separados para que no se cruzen los intervalos de los leds, lo cual lleva a que solo funcione una vez el programa debido a mi falta de tiempo y entendimiento del funcionamiento de python para corregir que el programa no ejecute el ultimo ciclo del 3er pixel bajo el ciclo While, cosa que desalinea todo el semaforo.  
