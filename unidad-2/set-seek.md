@@ -47,18 +47,18 @@ class Pixel:
                 else:
                     self.pixelState = 9
                 display.set_pixel(self.pixelX,self.pixelY,self.pixelState)
-
-pixel1 = Pixel(2,0,0,1000)
-pixel2 = Pixel(2,1,0,1000)
-pixel3 = Pixel(2,2,0,1000)
-
-for i in range (3):
-    pixel1.update()
-for i in range (3):
-    pixel2.update()  
-for i in range (3):
-    pixel3.update()    
-  
+                
+        pixel1 = Pixel(2,0,0,1000)
+        pixel2 = Pixel(2,1,0,1000)
+        pixel3 = Pixel(2,2,0,1000)
+        
+        for i in range (3):
+            pixel1.update()
+        for i in range (3):
+            pixel2.update()  
+        for i in range (3):
+            pixel3.update()   
+ 
 
 Esencialmente tiene los mismos eventos y estados del punto anterior.
 En un semaforo, estados (espera -> tiempo, accion -> cambio color)  
@@ -71,4 +71,5 @@ Este programa realiza tareas de forma concurrente ya que es capaz de continuar s
 #### Identifica los estados, eventos y acciones en el programa.  
 4 Estados. Inicial, feliz, sonrisa y triste.  
 2 Eventos. Presionar boton A y tiempo de espera.  
+
 Acciones. Cambio a feliz, cambio a sonrisa y cambio a triste.  
