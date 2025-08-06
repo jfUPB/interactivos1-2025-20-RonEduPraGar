@@ -69,7 +69,12 @@ El unico cambio es que en vez de un solo ciclo while, se usan 3 ciclos separados
 Este programa realiza tareas de forma concurrente ya que es capaz de continuar su ciclo base entre las expresiones a la vez que permite llamar a los estados que contienen a estas expresiones en cualquier momento, unicamente cambiando el contexto sobre el cual se muestra la expresion opuesta de la que este en display en el momento (feliz -> triste, triste -> feliz y sonrie -> feliz, siendo la excepcion de que cambia al opuesto).  
   
 #### Identifica los estados, eventos y acciones en el programa.  
-4 Estados. Inicial, feliz, sonrisa y triste.  
-2 Eventos. Presionar boton A y tiempo de espera.  
+4 Estados. Inicial (STATE_INIT), feliz (STATE_HAPPY), sonrisa (STATE_SMILE) y triste (STATE_SAD).  
+2 Eventos. Presionar boton A (if button_a.was_pressed():) y tiempo de espera (if utime.ticks_diff(utime.ticks_ms(), start_time) > interval:).  
+3 Acciones. Cambio a feliz (Image.HAPPY), cambio a sonrisa (Image.SMILE) y cambio a triste (Image.SAD).  
+#### Describir 3 Vectores de Prueba  
+##### 1. Llegar a estado Feliz desde estado Sonrisa  
+Inicia en estado "STATE_INIT" y muestra "Image.HAPPY", de aqui pasa a estado "STATE_HAPPY", despues de un determinado tiempo pasa a estado "STATE_SMILE" y muestra "Image.SMILE", desde este estado se ejecuta el evento de "if button_a.was_pressed():", desde el cual pasa a "STATE_HAPPY" y muestra "image.HAPPY".
+##### 2. Llegar a estado Sonrisa desde estado Triste  
 
-Acciones. Cambio a feliz, cambio a sonrisa y cambio a triste.  
+##### 3. Llegar a estado Triste desde estado Feliz   
