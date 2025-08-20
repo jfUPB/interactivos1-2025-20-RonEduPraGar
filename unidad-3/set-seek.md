@@ -12,6 +12,7 @@
 |Estado inicial|Evento disparador|Acciones|Estado final|
 |--|--|--|--|
 |explotado|tocar logo|mostrar contador|configuracion|
-|armado|enviar datos "A""B""A" (contraseña)|mostrar contador|configuracion|
-|||||
-|||||
+|armado|leer datos "A""B""A" (contraseña)|mostrar contador|configuracion|
+|configuracion|leer dato "A"|numero en contadro sube|configuracion|
+|configuracion|leer informacion "S"|mostrar cuenta regresiva por tiempo|armado|
+
