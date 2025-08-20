@@ -19,9 +19,10 @@
 |Estado inicial|Evento disparador|Acciones|Estado final|
 |--|--|--|--|
 |explotado|enviar radio mensaje "T"|leer evento, mostrar contador, cambio evento|configuracion|
-|armado|enviar radio mensaje "A""B""A" (contraseña)|leer eventos(radio) en orden, mostrar contador, cambio evento|configuracion|
+|armado|enviar radio mensaje "A"->"B"->"A" (contraseña)|leer eventos(radio) en orden, mostrar contador, cambio evento|configuracion|
 |configuracion|enviar radio mensaje "A"|leer evento, numero en contador sube|configuracion|
 |configuracion|enviar radio mensaje "S"|leer evento, mostrar cuenta regresiva por tiempo, cambio evento|armado|
+
 
 
 
