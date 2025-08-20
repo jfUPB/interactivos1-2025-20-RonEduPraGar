@@ -9,3 +9,9 @@
  * Acciones
  * Estado final
 
+|Estado inicial|Evento disparador|Acciones|Estado final|
+|--|--|--|--|
+|explotado|tocar logo|mostrar contador|configuracion|
+|armado|enviar datos "A""B""A" (contraseña)|mostrar contador|configuracion|
+|||||
+|||||
