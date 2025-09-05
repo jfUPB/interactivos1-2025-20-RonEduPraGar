@@ -2,7 +2,7 @@
 
 ## Código
 
-[Enlace a la aplicación a modificar](URL)
+[[Enlace a la aplicación a modificar](https://editor.p5js.org/generative-design/sketches/P_1_1_2_01)](URL)
 
 Código a modificar:
 
@@ -10,7 +10,7 @@ Código a modificar:
 
 ```
 
-[Enlace a la aplicación modificada](URL)
+[[Enlace a la aplicación modificada](https://editor.p5js.org/RonEduPraGar/sketches/rFFq57y4N)](URL)
 
 Código modificado:
 
@@ -21,4 +21,5 @@ Código modificado:
 ## Video
 
 [Video demostratativo](URL)
+
 
