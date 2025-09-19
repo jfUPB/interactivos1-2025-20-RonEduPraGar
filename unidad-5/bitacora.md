@@ -482,11 +482,11 @@ Tambien, vuelve increiblemente dificil trabajar con funciones de soltar boton, y
 En los criterios de evaluación:
 #### 1. Profundidad de la Indagación
 3.8  
-Se busca y entiende las razones del por qué funcionan o fallan varios de los aspectos dentro de los programas y se formulan preguntas basicas sobre el funcionamiento de estos, pero no se investiga de forma extensiva por encima de lo requerido,  
+Se busca y entiende las razones del por qué funcionan o fallan varios de los aspectos dentro de los programas (act 2 2da pregunta) y se formulan preguntas basicas sobre el funcionamiento de estos, pero no se investiga de forma extensiva por encima de lo requerido,  
 llegando a terminos especificos requeridos para el avance de la bitacora (en este caso, el formato de ">2h2b" y lo que implica para la efectividad del protocolo binario), pero no mucho mas alla de eso.
   
 #### 2. Calidad de la Experimentación
-3.4  Se formulan experimentos durante el proceso de indagar y crear la bitacora, pero estos no son completamente evidenciados aparte de ciertas preguntas donde es ideal probar el comportamiento del codigo para crear un entendimiento de los problemas/soluciones.
+3.4  Se formulan experimentos durante el proceso de indagar y crear la bitacora (act 2 2da pregunta, act 3 4ta pregunta), pero estos no son completamente evidenciados aparte de ciertas preguntas donde es ideal probar el comportamiento del codigo para crear un entendimiento de los problemas/soluciones.
 
 #### 3. Análisis y Reflexión
 3.9  Se indica la evidencia dentro de la bitacora, mas no se incluye toda evidencia de los procesos a la vez que se encuentran actividades incompletas (act 1 2da pregunta, evidencias dibujos/act 3, ultimas 2 preguntas / act 4, correccion funcion transferencia de datos a ser constante).
@@ -495,6 +495,7 @@ llegando a terminos especificos requeridos para el avance de la bitacora (en est
 3.2  Se entiende el funcionamiento y se dan evidencias basicas de conocimiento, pero no se dan explicaciones claras de este conocimiento ni claridad sobre los conceptos esperados dentro de la bitacora. Aparte de que no se responden las preguntas directamente relacionadas con estos conceptos (act 3, sobre Framing)
 
 ## Actividad 5
+
 
 
 
