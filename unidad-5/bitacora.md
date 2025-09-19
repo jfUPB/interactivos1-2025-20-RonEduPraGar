@@ -156,7 +156,10 @@ while True:
         uart.write(data)
 ```
 ### Captura el resultado del experimento. ¿Qué diferencias ves entre los datos en ASCII y en binario? ¿Qué ventajas y desventajas ves en usar un formato binario en lugar de texto en ASCII? ¿Qué ventajas y desventajas ves en usar un formato ASCII en lugar de binario?
-
+![En Texto](<evidencias/imagen (6).png>)
+![En Mixto](<evidencias/imagen (7).png>)
+![En HEX](<evidencias/imagen (8).png>)
+Primero
 ## Actividad 3
 Ahora vamos a modificar el código de p5.js para soportar la lectura de datos en formato binario.
 
@@ -186,7 +189,14 @@ microBitX: 500 microBitY: 513 microBitAState: false microBitBState: false
 
 Debido a el proceso de envio de datos, como se puede observar en esta captura, desde los primeros grupos de bytes es posible observar como estos pueden terminar conectados sin intencion del desarrollador, cambiando los valores y el orden de los sucesos y perdiendo seguridad en la transferencia de datos correcta.
 Esto puede ser en parte porque no se tiene una velocidad definida de transferencia, lo que puede estar causando problemas cuando varios computadores pueden procesar o transferir datos de maneras diferentes en cuanto a velocidad o metodologia, cualquier cambio en estos parametros, por minimo que sea, puede desviar los resultados de forma permanente.
-
+  
+![Ejemplo parte 1](<evidencias/imagen (11).png>)
+![Ejemplo parte 2](<evidencias/imagen (12).png>)
+  
+En este ejemplo inicia bien, pero inmediatamente (tal vez debido a la tasa de actualizacion?) empieza a cambiar los resultados y despues de un minimo tiempo esta completamente fuera de lugar, ya despues de desconectar y reconectar la señal del micro:bit vuelve a leerlos de forma correcta, pero luego termina en un mismo lugar.
+![alt text](<evidencias/imagen (13).png>)
+  
+  
 Para implementar la estrategia de framing será necesario modificar el código del micro:bit y el código de p5.js.
 
 En el caso del micro:bit se enviará un paquete de 8 bytes:
