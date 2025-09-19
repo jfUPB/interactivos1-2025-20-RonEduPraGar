@@ -94,6 +94,7 @@ while True:
 
 Abre la aplicación, configura el puerto, deja los valores por defecto y presiona Conectar. Selecciona el puerto del micro:bit (mbed Serial port) y presiona Conectar. Luego, en la sección de Recepción de Datos, en Mostrar datos como, selecciona Texto.
 
+<a name="ev1"></a>
 ### Captura el resultado del experimento anterior. ¿Por qué se ve este resultado?
 ![en Texto](<evidencias/imagen (2).png>)
 Se encuentra completamente ilegible, probablemente debido a que los datos no se estan enviando directamente en un formato de caracteres basico, cosa que confunde al traductor cuando intenta buscar los identificadores que lo lleven a descifrar el mensaje.  
@@ -482,7 +483,7 @@ Tambien, vuelve increiblemente dificil trabajar con funciones de soltar boton, y
 En los criterios de evaluación:
 #### 1. Profundidad de la Indagación
 3.8  
-Se busca y entiende las razones del por qué funcionan o fallan varios de los aspectos dentro de los programas (act 2 2da pregunta) y se formulan preguntas basicas sobre el funcionamiento de estos, pero no se investiga de forma extensiva por encima de lo requerido,  
+Se busca y entiende las razones del por qué funcionan o fallan varios de los aspectos dentro de los programas ([act 2 2da pregunta](#ev1)) y se formulan preguntas basicas sobre el funcionamiento de estos, pero no se investiga de forma extensiva por encima de lo requerido,  
 llegando a terminos especificos requeridos para el avance de la bitacora (en este caso, el formato de ">2h2b" y lo que implica para la efectividad del protocolo binario), pero no mucho mas alla de eso.
   
 #### 2. Calidad de la Experimentación
@@ -495,6 +496,7 @@ llegando a terminos especificos requeridos para el avance de la bitacora (en est
 3.2  Se entiende el funcionamiento y se dan evidencias basicas de conocimiento, pero no se dan explicaciones claras de este conocimiento ni claridad sobre los conceptos esperados dentro de la bitacora. Aparte de que no se responden las preguntas directamente relacionadas con estos conceptos (act 3, sobre Framing)
 
 ## Actividad 5
+
 
 
 
