@@ -22,7 +22,8 @@ Proceso: Computador 1 (presionar boton "Send Love"(mostrar corazon -> cara feliz
 ### Actividad 4  
 Crea tu propio programa en p5.js 
 [My Ride](https://editor.p5js.org/RonEduPraGar/sketches/i-uNj39De)  
-´´´ js
+
+  ``` js
 function setup() {
   createCanvas(400, 400);
   //console.log("dadadada");
@@ -37,4 +38,7 @@ function draw() {
   triangle(sin(t),cos(t), random(1,80), random(50, 100), 70, tan(t));
   t++;
 }
-´´´
+  ```
+
+
+
