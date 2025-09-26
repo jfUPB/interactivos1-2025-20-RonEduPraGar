@@ -39,7 +39,8 @@ function draw() {
   t++;
 }
   ```
-![codigo en funcion](unidad-1/image.png)
+![codigo en funcion](image.png)
+
 
 
 
