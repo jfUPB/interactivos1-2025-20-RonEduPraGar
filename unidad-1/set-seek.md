@@ -40,6 +40,13 @@ function draw() {
 }
   ```
 ![codigo en funcion](image.png)
+### Actividad 5
+#### Explica cómo funciona el sistema físico interactivo que acabamos de crear.
+Este sistema funciona con base en la conexion que puede tener el micro:bit directamente con el programa/editor de p5.js, 
+con base en esto, se sube una funcionalidad de lectura de las acciones ejectudas en el microbit, 
+especificamente la interaccion con el boton A y que hacer cuando se ejecuta cualquier otra accion, una manera primitiva pero que asegura que se tenga acceso a ambos comandos en todo momento,
+luego se le pone una pausa para controlar el flujo de datos.
+
 
 
 
