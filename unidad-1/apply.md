@@ -15,3 +15,74 @@ en la muestra de 2 colores con base en el dato enviado por el microbit, verde si
 
 ### Actividad 6
 ####
+[Concepto circulo movimiento eje X](https://editor.p5js.org/RonEduPraGar/sketches/yScEosDPS)
+
+  ``` python
+    from microbit import *
+
+uart.init(baudrate=115200)
+
+while True:
+
+    if button_a.is_pressed():
+        uart.write('A')
+    else:
+        uart.write('N')
+
+    sleep(100)
+  ```
+
+  ``` js
+      let port;
+  let connectBtn;
+  let connectionInitialized = false;
+  let x = 0;
+  let y = 200;
+
+  function setup() {
+    createCanvas(400, 400);
+    background(220);
+    port = createSerial();
+    connectBtn = createButton("Connect to micro:bit");
+    connectBtn.position(80, 300);
+    connectBtn.mousePressed(connectBtnClick);
+  }
+
+  function draw() {
+    background(220);
+
+    if (port.opened() && !connectionInitialized) {
+      port.clear();
+      connectionInitialized = true;
+    }
+
+    if (port.availableBytes() > 0) {
+      let dataRx = port.read(1);
+      if (dataRx == "A") {
+        fill("red");
+        x++;
+      } else if (dataRx == "N") {
+        fill("green");
+        x--;
+      }
+    }
+
+    rectMode(CENTER);
+    circle(x,y,40);
+
+    if (!port.opened()) {
+      connectBtn.html("Connect to micro:bit");
+    } else {
+      connectBtn.html("Disconnect");
+    }
+  }
+
+  function connectBtnClick() {
+    if (!port.opened()) {
+      port.open("MicroPython", 115200);
+      connectionInitialized = false;
+    } else {
+      port.close();
+    }
+  }
+  ```
