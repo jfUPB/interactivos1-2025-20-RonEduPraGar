@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualizador de Audio - Escritorio</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #111;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    #instructions {
+      position: absolute;
+      top: 10px;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      text-shadow: 0 0 5px black;
+    }
+  </style>
+</head>
+<body>
+  <div id="instructions">
+    <h2>🎧 Visualizador de Audio del Escritorio</h2>
+    <p>
+      Haz clic en “Compartir pantalla o pestaña con audio” cuando el navegador lo solicite.<br>
+      Si el audio es capturado correctamente, verás esferas moviéndose y una barra verde dinámica.
+    </p>
+  </div>
+
+  <!-- Cliente Socket.IO (necesario para comunicación con el servidor) -->
+  <script src="/socket.io/socket.io.js"></script>
+
+  <!-- Script principal del cliente de escritorio -->
+  <script src="./js/desktop.js"></script>
+</body>
+</html>

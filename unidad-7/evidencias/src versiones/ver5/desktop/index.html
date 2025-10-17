@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualizador de audio del escritorio</title>
+
+  <style>
+    /* Estilo base del documento */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #111;
+      color: white;
+      font-family: sans-serif;
+    }
+
+    /* Asegura que el canvas ocupe todo el fondo */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+    }
+
+    /* El botón será añadido por desktop.js, 
+       pero aseguramos que se vea sobre todo lo demás */
+    button {
+      position: fixed;
+      z-index: 9999;
+    }
+
+    /* Mensaje inicial opcional */
+    #intro {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #ccc;
+      z-index: 5;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Mensaje inicial visible antes de iniciar -->
+  <div id="intro">
+    <h2>🎧 Visualizador de audio</h2>
+    <p>Presiona el botón verde para iniciar la captura de audio del escritorio.</p>
+  </div>
+
+  <!-- Carga de scripts -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/desktop.js"></script>
+</body>
+</html>
