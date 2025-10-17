@@ -78,7 +78,7 @@ Ahora analizaremos el código que corre en los navegadores: el cliente móvil qu
   
 #### Realiza un diagrama donde muestres el flujo completo de datos y eventos entre los tres componentes: móvil, servidor y escritorio. Puedes ilustrar con un ejemplo de coordenadas táctiles (x, y) y cómo viajan a través del sistema.
   
-  
+![Diagrama(Esto funciona mejor en formato de lista)](evidencias/opera_XLKylH5ePy.png)  
   
 ## Actividad 05
   
