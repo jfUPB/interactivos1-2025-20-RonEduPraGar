@@ -89,6 +89,26 @@ Ahora que comprendes cómo funciona el sistema base, es tu turno de CREAR
   
 ### 🧐🧪✍️ Reporta en tu bitácora
   
-#### Diseña una aplicación interactiva que use el touch del móvil para controlar una visuales de tema musical de tu elección. Las visuales correrán en una aplicación de escritorio (desktop). Recuerda que ambas aplicaciones las construirás usando p5.js y utilizando el servidor Node.js como puente.
+#### Diseña una aplicación interactiva que use el touch del móvil para controlar una visuales de tema musical de tu elección. Las visuales correrán en una aplicación de escritorio (desktop). Recuerda que ambas aplicaciones las construirás usando p5.js y utilizando el servidor Node.js como puente.  
+Mi aplicacion buscaria representar el audio del escritorio en el cliente movil por medio de la identificacion de las frecuencias que componen el audio, haciendo uso de estas frecuencias para presentar esferas de diferentes colores y tamaños dependiendo de la frecuencia, que cambian de tamaño dependiendo de la potencia de la frecuencia correspondiente, estas esferas se deben poder mover con el cliente movil enviando la informacion de la posicion de una esfera solo si esta activa (definido por la interaccion tactil con la esfera respectiva).
 #### Implementa tu diseño. Puedes usar IA generativa para ayudarte a escribir el código, pero primero debes hacer el diseño de lo que quieres.
+Con tal de tener una base sobre la cual trabajar y tambien de conocer o entender funciones con las que no he trabajado previamente dentro de Python y en Node.js, se hizo uso de ChatGPT.
+Se uso el diseño de la aplicacion descrita en la primera parte, con lo cual ChatGPT establecio una explicacion basica de los posibles requerimientos de una aplicacion de este tipo de forma general
+![idea preliminar](evidencias/opera_BKK9fOA9ET.gif)
+Luego, se le pide a ChatGPT crear un diagrama con base en la infraestructura de Node.js, y termina creando la primera* (segunda, debido a que la primera vez no genero por completo y cambio todo en el reintento) version del proyecto en el proceso, aunque aun los considera "ejemplos".
+![desarrollo de ChatGPT "Idea"](evidencias/opera_3STohmzPYq.gif)
+Ya con tal de probar la efectividad del "experimento", se crea una copia directa del ejemplo utilizado durante esta unidad y se crean los archivos con base en lo descrito por ChatGPT.
+Con base en esto, el programa no funciona, empezando porque no aparecen las esferas, y la completa falta de un entorno visual desde el cual entender que esta pasando o con el cual confirmar si todo funciona correctamente debido a la falta de mensajes de confirmacion.
+Despues de este intento fallido, se procede a pedir a ChatGPT
+"Me disculpo, la aplicacion no esta mostrando graficamente si esta recibiendo la señal, por favor revisa que si este recibiendo el audio del escritorio en el cliente de escritorio y genera una interfaz simple que delimite el movimiento de las esferas, no es necesario cambiar mas que eso."
+Lo que nos lleva al codigo del siguiente intento:
+![intento de correccion 1](evidencias/opera_5U7xuDghPE.png)
+En esta ocasion, solo se cambia el codigo de la version de escritorio, con el objetivo de generar una base de telemetria con la cual estar seguros del funcionamiento del sitio y las conexiones.
+Despues de volver a intentar se decide retomar la estructura inicial de servidor y las definiciones usadas dentro del programa de practica de la unidad en caso de que los problemas sean causados por este cambio.
+A este punto, tratando de encontrar el problema o los errores (mejor dicho, su completa falta de funcionamiento) se empieza a revisar el codigo directamente y se nota la completa falta de cambios en los archivos index, error fatal en cuanto a la creacion de la aplicacion.
+Despues de corregir esto se empieza a observar el UI.
+![Dolor](opera_oTw4KOABGm.png)
+![Desgracia](<WhatsApp Image 2025-10-17 at 10.15.13 AM.jpeg>)
+7 Versiones y un sueño de que los navegadores me dejen tomar el audio de alguna manera que no sea solo microfono.
+No se cual pueda ser el problema, intente los 3 metodos de captura (ya sea desde un video con solo el audio, sacando el audio compartido de una pestaña o directamente escuchar el escritorio) ninguno ha servido.
 #### Incluye todos los códigos (servidor y clientes) en tu bitácora.
