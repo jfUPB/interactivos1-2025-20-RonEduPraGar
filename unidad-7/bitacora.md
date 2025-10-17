@@ -111,4 +111,290 @@ Despues de corregir esto se empieza a observar el UI.
 ![Desgracia](<WhatsApp Image 2025-10-17 at 10.15.13 AM.jpeg>)
 7 Versiones y un sueño de que los navegadores me dejen tomar el audio de alguna manera que no sea solo microfono.
 No se cual pueda ser el problema, intente los 3 metodos de captura (ya sea desde un video con solo el audio, sacando el audio compartido de una pestaña o directamente escuchar el escritorio) ninguno ha servido.
-#### Incluye todos los códigos (servidor y clientes) en tu bitácora.
+El error es definitivamente con los permisos o el mensaje/la peticion de permiso que envia el programa, pero no se como resolver este problema en estos momentos, y no puedo tomarme otras 8 horas buscando el por que.
+El codigo es el siguiente, en su ultima version.
+#### Desktop
+##### index.html
+``` js
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualizador de audio del escritorio</title>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #111;
+      color: white;
+      font-family: sans-serif;
+    }
+
+    #intro {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #ccc;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+    }
+
+    #startButton {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #28a745;
+      color: white;
+      cursor: pointer;
+      z-index: 9999;
+    }
+
+    #startButton:disabled {
+      background: #555;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <div id="intro">
+    <h2>🎧 Visualizador de audio</h2>
+    <p>Presiona el botón verde para iniciar la captura de audio del escritorio.</p>
+  </div>
+
+  <!-- Botón añadido desde HTML -->
+  <button id="startButton">🎧 Iniciar captura de audio del escritorio</button>
+
+  <!-- Scripts -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/desktop.js"></script>
+</body>
+</html>
+
+```
+##### sketch.js
+``` js
+const socket = io();
+const canvas = document.createElement("canvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+document.body.appendChild(canvas);
+const ctx = canvas.getContext("2d");
+
+const startButton = document.getElementById("startButton");
+
+async function startCapture() {
+  console.log("Solicitando permiso de captura…");
+  try {
+    // Esta llamada sólo funciona si proviene de un gesto de usuario
+    const displayStream = await navigator.mediaDevices.getDisplayMedia({
+      video: true,
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false
+      }
+    });
+
+    // Detener el video inmediatamente; nos quedamos sólo con el audio
+    displayStream.getVideoTracks().forEach(t => t.stop());
+
+    const audioTracks = displayStream.getAudioTracks();
+    if (audioTracks.length === 0) {
+      alert("No se detectó audio del sistema. Elige una pestaña o ventana con sonido activo.");
+      return;
+    }
+
+    console.log("✅ Captura iniciada:", audioTracks[0].label);
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioCtx.createMediaStreamSource(new MediaStream(audioTracks));
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    source.connect(analyser);
+
+    drawVisualizer(analyser, dataArray, audioCtx);
+
+  } catch (err) {
+    console.error("❌ Error de captura:", err);
+    alert("No se pudo iniciar la captura: " + err.message);
+  }
+}
+
+function drawVisualizer(analyser, dataArray, audioCtx) {
+  const sphereCount = 16;
+  const spheres = Array.from({ length: sphereCount }, () => ({
+    x: Math.random() * (canvas.width - 80) + 40,
+    y: Math.random() * (canvas.height - 80) + 40,
+    r: 10,
+    amp: 0
+  }));
+
+  function loop() {
+    analyser.getByteFrequencyData(dataArray);
+    ctx.fillStyle = "#111";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+    const barWidth = Math.min((avg / 255) * (canvas.width - 40), canvas.width - 40);
+    ctx.fillStyle = avg > 10 ? "lime" : "red";
+    ctx.fillRect(20, canvas.height - 30, barWidth, 10);
+
+    for (let i = 0; i < spheres.length; i++) {
+      const amp = dataArray[i * Math.floor(dataArray.length / sphereCount)] / 255;
+      const s = spheres[i];
+      s.r = 10 + amp * 40;
+      s.x += (Math.random() - 0.5) * 3;
+      s.y += (Math.random() - 0.5) * 3;
+      s.x = Math.min(Math.max(s.x, 40), canvas.width - 40);
+      s.y = Math.min(Math.max(s.y, 40), canvas.height - 40);
+      const hue = (i * 30) % 360;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `hsl(${hue},100%,50%)`;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+}
+
+startButton.addEventListener("click", () => {
+  startButton.disabled = true;
+  startButton.textContent = "Capturando audio...";
+  startCapture(); // <- llamada dentro del click garantiza que Chrome muestre permisos
+});
+
+```
+#### Mobile
+##### index.html
+``` js
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualizador - Cliente Móvil</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #111;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h3 style="position:absolute; top:10px; left:0; right:0; text-shadow:0 0 5px black;">
+    📱 Cliente Móvil - Visualizador
+  </h3>
+
+  <canvas></canvas>
+
+  <!-- Cliente Socket.IO -->
+  <script src="/socket.io/socket.io.js"></script>
+
+  <!-- Script del cliente móvil -->
+  <script src="./js/mobile.js"></script>
+</body>
+</html>
+
+```
+##### sketch.js
+``` js
+const socket = io();
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");
+
+let spheres = [];
+
+socket.on("updateFrequencies", (data) => {
+  spheres = data.map((f, i) => ({
+    id: i,
+    freq: f.freq,
+    amp: f.amp,
+    x: Math.sin(i) * 100 + canvas.width/2,
+    y: Math.cos(i) * 100 + canvas.height/2,
+  }));
+});
+
+canvas.addEventListener("touchmove", (e) => {
+  const t = e.touches[0];
+  // ejemplo simple: mover esfera activa
+  socket.emit("sphereMove", { id: 0, x: t.clientX, y: t.clientY });
+});
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  spheres.forEach(s => {
+    const radius = 10 + s.amp * 50;
+    const color = `hsl(${s.freq/50}, 100%, 50%)`;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+```
+#### Server
+##### server.js
+``` js
+const express = require('express');
+const http = require('http');
+const socketIO = require('socket.io');
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIO(server); 
+const port = 3000;
+
+app.use(express.static("public"));
+
+io.on("connection", (socket) => {
+  console.log('New client connected', socket.id);
+
+  // Recibir datos de frecuencias del escritorio
+  socket.on("frequencies", (data) => {
+    io.emit("updateFrequencies", data); // reenviar a móviles
+  });
+  // Recibir posiciones de esferas desde el móvil
+  socket.on("sphereMove", (sphereData) => {
+    io.emit("spherePositionUpdate", sphereData); // broadcast opcional
+  });
+  socket.on('disconnect', () => {
+        console.log('Client disconnected');
+    });
+});
+
+server.listen(3000, () => console.log("Servidor en http://localhost:3000"));
+
+```
+### Autoevaluacion
