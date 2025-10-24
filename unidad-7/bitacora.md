@@ -121,73 +121,44 @@ El codigo es el siguiente, en su ultima version.
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Visualizador de audio del escritorio</title>
-
+  <title>Visualizador de audio</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script defer src="sketch.js"></script>
   <style>
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
       overflow: hidden;
-      background-color: #111;
-      color: white;
-      font-family: sans-serif;
+      background: #111;
     }
-
-    #intro {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      color: #ccc;
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
-      z-index: 1;
-    }
-
     #startButton {
-      position: fixed;
+      position: absolute;
       top: 20px;
       left: 20px;
       padding: 12px 20px;
-      font-size: 16px;
+      background: #00ff88;
+      color: #000;
+      font-weight: bold;
       border: none;
       border-radius: 8px;
-      background: #28a745;
-      color: white;
       cursor: pointer;
-      z-index: 9999;
+      z-index: 10;
     }
-
-    #startButton:disabled {
-      background: #555;
-      cursor: default;
+    #interactionStatus {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-family: monospace;
+      background: rgba(0,0,0,0.5);
+      padding: 8px 12px;
+      border-radius: 8px;
+      z-index: 10;
     }
   </style>
 </head>
 <body>
-  <div id="intro">
-    <h2>🎧 Visualizador de audio</h2>
-    <p>Presiona el botón verde para iniciar la captura de audio del escritorio.</p>
-  </div>
-
-  <!-- Botón añadido desde HTML -->
-  <button id="startButton">🎧 Iniciar captura de audio del escritorio</button>
-
-  <!-- Scripts -->
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="js/desktop.js"></script>
+  <button id="startButton">Iniciar captura</button>
+  <div id="interactionStatus">Sin interacción</div>
 </body>
 </html>
 
@@ -202,91 +173,126 @@ document.body.appendChild(canvas);
 const ctx = canvas.getContext("2d");
 
 const startButton = document.getElementById("startButton");
+const interactionStatus = document.getElementById("interactionStatus");
+
+// Estado de interacción proveniente del móvil
+let mobileInteraction = { type: "none", x: 0.5, y: 0.5 };
+socket.on("mobileInteraction", data => {
+  mobileInteraction = data;
+  if (data.type === "attract") interactionStatus.textContent = "🧲 Atracción";
+  else if (data.type === "repel") interactionStatus.textContent = "💥 Repulsión";
+  else interactionStatus.textContent = "Sin interacción";
+});
 
 async function startCapture() {
-  console.log("Solicitando permiso de captura…");
   try {
-    // Esta llamada sólo funciona si proviene de un gesto de usuario
     const displayStream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
-      audio: {
-        echoCancellation: false,
-        noiseSuppression: false,
-        autoGainControl: false
-      }
+      audio: true
     });
-
-    // Detener el video inmediatamente; nos quedamos sólo con el audio
     displayStream.getVideoTracks().forEach(t => t.stop());
 
-    const audioTracks = displayStream.getAudioTracks();
-    if (audioTracks.length === 0) {
-      alert("No se detectó audio del sistema. Elige una pestaña o ventana con sonido activo.");
-      return;
-    }
-
-    console.log("✅ Captura iniciada:", audioTracks[0].label);
-
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioCtx.createMediaStreamSource(new MediaStream(audioTracks));
+    const source = audioCtx.createMediaStreamSource(displayStream);
     const analyser = audioCtx.createAnalyser();
     analyser.fftSize = 256;
     const dataArray = new Uint8Array(analyser.frequencyBinCount);
     source.connect(analyser);
 
-    drawVisualizer(analyser, dataArray, audioCtx);
+    const sphereCount = 16;
+    const spheres = Array.from({ length: sphereCount }, () => ({
+      x: Math.random() * (canvas.width - 80) + 50,
+      y: Math.random() * (canvas.height - 80) + 50,
+      r: 14,
+      amp: 0
+    }));
 
-  } catch (err) {
-    console.error("❌ Error de captura:", err);
-    alert("No se pudo iniciar la captura: " + err.message);
-  }
-}
+    function drawVisualizer() {
+      analyser.getByteFrequencyData(dataArray);
+      ctx.fillStyle = "#111";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-function drawVisualizer(analyser, dataArray, audioCtx) {
-  const sphereCount = 16;
-  const spheres = Array.from({ length: sphereCount }, () => ({
-    x: Math.random() * (canvas.width - 80) + 40,
-    y: Math.random() * (canvas.height - 80) + 40,
-    r: 10,
-    amp: 0
-  }));
+      const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
 
-  function loop() {
-    analyser.getByteFrequencyData(dataArray);
-    ctx.fillStyle = "#111";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Dibujar marco de área
+      ctx.strokeStyle = "#333";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
 
-    const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-    const barWidth = Math.min((avg / 255) * (canvas.width - 40), canvas.width - 40);
-    ctx.fillStyle = avg > 10 ? "lime" : "red";
-    ctx.fillRect(20, canvas.height - 30, barWidth, 10);
+      for (let i = 0; i < spheres.length; i++) {
+        const amp = dataArray[i * Math.floor(dataArray.length / sphereCount)] / 255;
+        const s = spheres[i];
+        s.r = 14 + amp * 50;
 
-    for (let i = 0; i < spheres.length; i++) {
-      const amp = dataArray[i * Math.floor(dataArray.length / sphereCount)] / 255;
-      const s = spheres[i];
-      s.r = 10 + amp * 40;
-      s.x += (Math.random() - 0.5) * 3;
-      s.y += (Math.random() - 0.5) * 3;
-      s.x = Math.min(Math.max(s.x, 40), canvas.width - 40);
-      s.y = Math.min(Math.max(s.y, 40), canvas.height - 40);
-      const hue = (i * 30) % 360;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = `hsl(${hue},100%,50%)`;
-      ctx.fill();
+        // Movimiento aleatorio leve
+        s.x += (Math.random() - 0.5) * 2;
+        s.y += (Math.random() - 0.5) * 2;
+
+        // --- Aplicar interacción móvil ---
+        if (mobileInteraction.type !== "none") {
+          const tx = mobileInteraction.x * canvas.width;
+          const ty = mobileInteraction.y * canvas.height;
+          const dx = tx - s.x;
+          const dy = ty - s.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+          // Fuerza más perceptible
+          const intensity = mobileInteraction.type === "attract" ? 1.6 : -1.6;
+          const falloff = Math.min(1, 200 / dist);
+          s.x += (dx / dist) * intensity * falloff;
+          s.y += (dy / dist) * intensity * falloff;
+
+          // Indicador visual del punto de interacción
+          if (i === 0) {
+            ctx.beginPath();
+            ctx.arc(tx, ty, 40, 0, Math.PI * 2);
+            ctx.strokeStyle = mobileInteraction.type === "attract" ? "#00ffcc" : "#ff4444";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+          }
+        }
+
+        // Mantener dentro de límites
+        s.x = Math.min(Math.max(s.x, 40), canvas.width - 40);
+        s.y = Math.min(Math.max(s.y, 40), canvas.height - 40);
+
+        const hue = (i * 30) % 360;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `hsl(${hue},100%,50%)`;
+        ctx.fill();
+      }
+
+      // Barra de diagnóstico de audio
+      const barWidth = Math.min((avg / 255) * (canvas.width - 40), canvas.width - 40);
+      ctx.fillStyle = avg > 10 ? "lime" : "red";
+      ctx.fillRect(20, canvas.height - 30, barWidth, 10);
+
+      // Texto de estado de audio
+      ctx.font = "16px monospace";
+      ctx.fillStyle = "white";
+      ctx.fillText(
+        avg > 10 ? `Audio detectado (${avg.toFixed(1)})` : "Esperando audio...",
+        20,
+        canvas.height - 40
+      );
+
+      requestAnimationFrame(drawVisualizer);
     }
 
-    requestAnimationFrame(loop);
+    drawVisualizer();
+  } catch (err) {
+    console.error("Error al capturar audio:", err);
+    alert("Error al capturar audio: " + err.message);
   }
-
-  loop();
 }
 
 startButton.addEventListener("click", () => {
   startButton.disabled = true;
   startButton.textContent = "Capturando audio...";
-  startCapture(); // <- llamada dentro del click garantiza que Chrome muestre permisos
+  startCapture();
 });
+
 
 ```
 #### Mobile
@@ -296,31 +302,34 @@ startButton.addEventListener("click", () => {
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visualizador - Cliente Móvil</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control móvil</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script defer src="./sketch.js"></script>
   <style>
-    body {
+    html, body {
       margin: 0;
-      overflow: hidden;
-      background-color: #111;
+      height: 100%;
+      background: #111;
       color: white;
       font-family: sans-serif;
+      overflow: hidden;
+      touch-action: none;
+    }
+    #touchArea {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2em;
+      opacity: 0.7;
       text-align: center;
     }
   </style>
 </head>
 <body>
-  <h3 style="position:absolute; top:10px; left:0; right:0; text-shadow:0 0 5px black;">
-    📱 Cliente Móvil - Visualizador
-  </h3>
-
-  <canvas></canvas>
-
-  <!-- Cliente Socket.IO -->
-  <script src="/socket.io/socket.io.js"></script>
-
-  <!-- Script del cliente móvil -->
-  <script src="./js/mobile.js"></script>
+  <div id="touchArea">Toca con 1 dedo (atraer) o 2 dedos (repeler)</div>
 </body>
 </html>
 
@@ -328,85 +337,135 @@ startButton.addEventListener("click", () => {
 ##### sketch.js
 ``` js
 const socket = io();
-const canvas = document.querySelector("canvas");
-const ctx = canvas.getContext("2d");
+const area = document.getElementById("touchArea");
 
-let spheres = [];
+function handleTouch(event) {
+  event.preventDefault();
+  const touches = event.touches;
 
-socket.on("updateFrequencies", (data) => {
-  spheres = data.map((f, i) => ({
-    id: i,
-    freq: f.freq,
-    amp: f.amp,
-    x: Math.sin(i) * 100 + canvas.width/2,
-    y: Math.cos(i) * 100 + canvas.height/2,
-  }));
-});
+  if (touches.length === 0) return;
+  const type = touches.length === 1 ? "attract" : "repel";
 
-canvas.addEventListener("touchmove", (e) => {
-  const t = e.touches[0];
-  // ejemplo simple: mover esfera activa
-  socket.emit("sphereMove", { id: 0, x: t.clientX, y: t.clientY });
-});
+  // Calcular punto medio de los dedos
+  let x = 0, y = 0;
+  for (let i = 0; i < touches.length; i++) {
+    x += touches[i].clientX;
+    y += touches[i].clientY;
+  }
+  x /= touches.length;
+  y /= touches.length;
 
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  spheres.forEach(s => {
-    const radius = 10 + s.amp * 50;
-    const color = `hsl(${s.freq/50}, 100%, 50%)`;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-  });
-  requestAnimationFrame(draw);
+  // Normalizar coordenadas
+  const nx = x / window.innerWidth;
+  const ny = y / window.innerHeight;
+  let touchData = {
+      type,
+      x: nx,
+      y: ny
+  };
+  socket.emit("mobileInteraction", touchData);
+  console.log('Sent');
+
+  area.textContent = type === "attract"
+    ? "🧲 Atrayendo esferas..."
+    : "💥 Repeliendo esferas...";
 }
-draw();
+
+function endTouch() {
+  area.textContent = "Toca con 1 dedo (atraer) o 2 dedos (repeler)";
+  socket.emit("mobileInteraction", { type: "none" });
+}
+
+area.addEventListener("touchstart", handleTouch);
+area.addEventListener("touchmove", handleTouch);
+area.addEventListener("touchend", endTouch);
+area.addEventListener("touchcancel", endTouch);
 
 ```
 #### Server
 ##### server.js
 ``` js
-const express = require('express');
-const http = require('http');
-const socketIO = require('socket.io');
+// =======================================================
+// Servidor principal de la aplicación
+// =======================================================
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIO(server); 
-const port = 3000;
+const io = new Server(server);
 
-app.use(express.static("public"));
+// -------------------------------------------------------
+// SERVIR ARCHIVOS ESTÁTICOS
+// -------------------------------------------------------
+app.use(express.static(path.join(__dirname, "public")));
 
-io.on("connection", (socket) => {
-  console.log('New client connected', socket.id);
-
-  // Recibir datos de frecuencias del escritorio
-  socket.on("frequencies", (data) => {
-    io.emit("updateFrequencies", data); // reenviar a móviles
-  });
-  // Recibir posiciones de esferas desde el móvil
-  socket.on("sphereMove", (sphereData) => {
-    io.emit("spherePositionUpdate", sphereData); // broadcast opcional
-  });
-  socket.on('disconnect', () => {
-        console.log('Client disconnected');
-    });
+// Cliente de escritorio
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
-server.listen(3000, () => console.log("Servidor en http://localhost:3000"));
+// Cliente móvil
+app.get("/mobile", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/mobile/index.html"));
+});
 
+// -------------------------------------------------------
+// SOCKET.IO
+// -------------------------------------------------------
+io.on("connection", (socket) => {
+  console.log("🟢 Cliente conectado:", socket.id);
+
+  // ---------------------------
+  // Frecuencias desde el escritorio
+  // ---------------------------
+  socket.on("frequencies", (data) => {
+    socket.broadcast.emit("frequencies", data);
+  });
+
+  // ---------------------------
+  // Interacción móvil (atraer / repeler)
+  // ---------------------------
+  socket.on("mobileInteraction", (data) => {
+    console.log(
+      `📱 Interacción móvil recibida -> tipo: ${data.action}, dedos: ${data.touches}`
+    );
+    socket.broadcast.emit("mobileInteraction", data);
+  });
+
+  // ---------------------------
+  // Desconexión
+  // ---------------------------
+  socket.on("disconnect", () => {
+    console.log("🔴 Cliente desconectado:", socket.id);
+  });
+});
+
+// -------------------------------------------------------
+// INICIO DEL SERVIDOR
+// -------------------------------------------------------
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`🚀 Servidor en ejecución en http://localhost:${PORT}`);
+});
 ```
 ### Autoevaluacion
-4.6
+5.0
 Considero que hice un trabajo completo con base en los recursos y la informacion provista durante la actividad, utilizando los contextos para inferir y complementar conocimientos previos, investigando diferentes fuentes por definiciones que no sean completamente claras o que fueran de interes aunque no sean directamente relevantes a las preguntas.   
 El mayor problema (y la razon de la nota) es que no logre probar el concepto del programa con el cual queria trabajar, debido a que la peticion por los permisos que requiere un programa como este para poder recibir audios y funcionar nunca salio mas de una vez, no existen evidencias mas alla de la pantalla de inicio del aplicativo web debido a que no fueron observadas, y en un intento de no romper todo el programa por remover un elemento visual equivocado (no manejo html/js muy bien, pero mas de una vez me ha pasado que un solo elemento mal colocado en uno de esos 2 desaparece todo el proyecto), se extendieron las horas 20X mas de lo que deberia durar el desarrollo de un aplicativo de estos, tambien es mi culpa por querer ver la efectividad de usar una IA para "acelerar" el proceso de codigo y aprendizaje de diferentes comandos y posibilidades (posible de observar en varios de los ejemplos, especificamente en el metodo por el cual se toma o se separa el audio de la fuente correspondiente), pasando por formas de conseguir audio por microfono, ventana, escritorio o todo el navegador, desde videos manteniendo la fuente intacta o separando el audio para su procesamiento, todo para que el problema sea un sistema de seguridad que a estas alturas causa mas problemas de los que resuelve (esto al menos en Chromium, considerando que Firefox ni lo cuentan en varias de estas cosas :/, se intento resolver el problema en Chrome, Opera, Opera GX, Firefox y Vivaldi, tal vez sea problema de seguridad en el PC con Windows Defender especificamente, o algo mas fuera de mi control como la configuracion de un router de Movistar).  
 Me frustra mas de lo que quiero admitir, no fue posible mejorar la parte grafica debido a que la parte funcional nunca llego al punto importante de evaluacion en su funcionamiento y buscar soluciones fue obtuso para esta ultima pregunta debido a la cantidad de soluciones que no funcionaban en cada momento, comparado con las investigaciones para las actividades [Actividad 3](#actividad-03) y [Actividad 2](#actividad-02), desde cambios de banderas obsoletas, intentos de engaño al navegador y algo tan simple como tratar de que vuelva a leer el input del microfono, nada funciono.  
-Necesitaba mas tiempo, pero de por si me gaste mas tiempo del que tenia, avanzando a paso de tortuga.  
-La calificacion la considero dividida de la siguiente manera:
+Necesitaba mas tiempo, pero de por si me gaste mas tiempo del que tenia, avanzando a paso de tortuga. 
+Despues de otras 7 horas, se logra hacer funcional.  
+Despues de otras 3 horas, se crea una version decente.  
+Entre posibles errores, se encontraron problemas de directorio, problemas con la estructura del archivo de servidor y fallas con la representacion de la idea del proyecto entre otras cosas.  
+Al final se toma la idea de usar funciones de atraccion y repulsion para crear la interaccion con el celular y hacer la representacion del audio mas interesante.  
+De ser posible, preferiria mantener la idea pero en una escala mas grande, considerando cambiar los colores usados por frecuencia, removiendo los elementos mas externos de la estructura de datos (siendo estos las frecuencias menos utilizadas o indetectables), revisando tambien la prioridad de las frecuencias con tal de mostrar mejor las diferencias entre varios tipos de musica.
+La calificacion la considero dividida de la siguiente manera:  
 * Actividad 1: 5.0
 * Actividad 2: 5.0
 * Actividad 3: 5.0
-* Actividad 4: 4.2
-* Actividad 5: 4.0
-Total: 4.64 
+* Actividad 4: 5.0
+* Actividad 5: 5.0
+Total: 5.0  
