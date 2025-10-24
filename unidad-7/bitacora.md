@@ -458,9 +458,12 @@ El mayor problema (y la razon de la nota) es que no logre probar el concepto del
 Me frustra mas de lo que quiero admitir, no fue posible mejorar la parte grafica debido a que la parte funcional nunca llego al punto importante de evaluacion en su funcionamiento y buscar soluciones fue obtuso para esta ultima pregunta debido a la cantidad de soluciones que no funcionaban en cada momento, comparado con las investigaciones para las actividades [Actividad 3](#actividad-03) y [Actividad 2](#actividad-02), desde cambios de banderas obsoletas, intentos de engaño al navegador y algo tan simple como tratar de que vuelva a leer el input del microfono, nada funciono.  
 Necesitaba mas tiempo, pero de por si me gaste mas tiempo del que tenia, avanzando a paso de tortuga. 
 Despues de otras 7 horas, se logra hacer funcional.  
+![Sin Interaccion](opera_0yf1g2LYtr.gif)
 Despues de otras 3 horas, se crea una version decente.  
 Entre posibles errores, se encontraron problemas de directorio, problemas con la estructura del archivo de servidor y fallas con la representacion de la idea del proyecto entre otras cosas.  
 Al final se toma la idea de usar funciones de atraccion y repulsion para crear la interaccion con el celular y hacer la representacion del audio mas interesante.  
+![Atraccion](opera_ET9KBr5XgJ.png)
+![Repulsion](opera_Yj1SwFs8N9.png)
 De ser posible, preferiria mantener la idea pero en una escala mas grande, considerando cambiar los colores usados por frecuencia, removiendo los elementos mas externos de la estructura de datos (siendo estos las frecuencias menos utilizadas o indetectables), revisando tambien la prioridad de las frecuencias con tal de mostrar mejor las diferencias entre varios tipos de musica.
 La calificacion la considero dividida de la siguiente manera:  
 * Actividad 1: 5.0
