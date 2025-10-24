@@ -194,3 +194,6 @@ De la misma manera que dejar el fondo despues de dibujar el circulo resulta en l
 ## Actividad 5
 #### 🎯 Enunciado
 Basado en la infraestructura de comunicación del caso de estudio vas a crear tu propia aplicación interactiva en tiempo real. Diseño algo completamente nuevo usando la misma tecnología de comunicación. ¡Sé creativo! Quiero insistirte con algo. No se trata de solo cambiar el diseño o la apariencia de la aplicación. Se trata de crear algo nuevo, diferente y original.
+
+
+## Autoevaluacion
