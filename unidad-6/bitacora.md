@@ -34,19 +34,29 @@ www.piucenter.com - dominio
 Escribir el dominio directamente, lleva a la pagina base del sitio.
 ![PIU Center](opera_Leaew3CLMn.png)
 ##### Compara HTTP con los protocolos seriales que usaste.
-Comparado con ASCII y Binario con framing, este protocolo permite un envio de informacion mas completo, ya sea en cantidad o seguridad, donde este envia un paquete que incluye lo necesario para el funcionamiento de la aplicacion sin  
+Comparado con ASCII y Binario con framing, este protocolo permite un envio de informacion mas exacto, ya sea en cantidad o seguridad, donde este envia un paquete que incluye lo necesario para su funcionamiento con las intenciones de su uso y sus contenidos limitados bajo etiquetas del tipo de archivo.  
 ##### ¿Qué similitudes encuentras?
+El requerimiento de delimitacion de los paquetes para la lectura de los datos y los envios y recepciones de mensajes.
 ##### ¿Qué diferencias clave ves?
+La definicion de un tipo de intencion/archivo para recibir/enviar el paquete, el tamaño del paquete (siendo este posiblemente un archivo de informacion en vez de bits en cantidades exactas)
 ##### ¿Por qué crees que HTTP necesita ser más complejo que un simple envío de bytes como hacías con el micro:bit?
+Esto posiblemente debido a la cantidad de informacion y las difencias en el numero de bites procesados, ademas de la necesidad de asignar los archivos a diferentes aspectos de las aplicaciones o paginas.
 ##### Piensa en una página web simple, como un formulario de login.
 ##### ¿Qué parte crees que es HTML (ej. los campos de texto, el botón)?
+La parte que dibuja o define el sitio, en este caso los campos de texto de usuario y contraseña y los botones de acceso
 ##### ¿Qué parte es CSS (ej. el color del botón, el tipo de letra)?
+La parte que maneja los objetos puramente graficos (formas, efectos, tipos de letra, colores, transparencias, aspecto grafico de objetos interactivos), en este caso los colores de los campos de texto y el tipo de letra dentro de estos y los botones, asi como los colores del boton y sus cambios de color en interaccion
 ##### ¿Qué parte es JavaScript (ej. la comprobación de si escribiste algo antes de enviar, el mensaje de “contraseña incorrecta” que aparece sin recargar la página)?
+Todo lo que identifica y traduce las interacciones del usuario en informacion utilizable dentro del sitio, expandiendo su funcionalidad. En este caso, la comparacion de la informacion y la autorizacion de acceso al sitio.
 ##### Compara el bucle draw() de p5.js con este modelo de “esperar a que algo pase y reaccionar”.
 ##### ¿Qué ventajas crees que tiene el modelo basado en eventos para una interfaz de usuario web?
+Primero, un ahorro de recursos, usando solo los necesarios para ejecutar un evento, permitiendo tambien un enfoque en funciones eficientes y modulares
 ##### ¿Sería eficiente tener un bucle draw() redibujando toda la página 60 veces por segundo si nada ha cambiado?
+Seria un desperdicio de poder de procesamiento y memoria, cuando esto puede funcionar sin estar en un constante bucle.
 ##### ¿Por qué crees que podría ser útil usar JavaScript tanto en el cliente (navegador) como en el servidor? ¿Se te ocurre alguna ventaja para los desarrolladores?
+Consistencia, al ser el mismo formato permite un trabajo mas fluido y unificado entre los diferentes archivos sin requerir el doble de investigacion y conocimiento, tambien permite la conexion entre ambos aspectos (cliente y servidor) sin requerir cambios o traducciones intermedias, reduciendo la carga en terminos de codigo.
 ##### Resume con tus propias palabras la diferencia fundamental entre una comunicación HTTP tradicional y una comunicación usando WebSockets/Socket.IO. ¿En qué tipo de aplicaciones has visto o podrías imaginar que se usa esta comunicación en tiempo real?
+En HTTP siempre es necesario recibir un mensaje antes de enviar uno, siempre se depende de un ciclo de envios y esperas, en comparacion, los Sockets son una conexion constante, siempre disponibles para enviar o recibir informacion, ambos tipos creo que son observables en aplicaciones de reproduccion de video online como youtube, donde las paginas funcionan con una base de HTML, pero funciones como la reproduccion de videos o previews son mas comparables al tipo de comunicacion de WebSockets/Socket.IO.
 ## Actividad 3
 #### 🎯 Enunciado
 Analizaremos juntos el código del servidor server.js línea por línea.
@@ -58,7 +68,7 @@ Cambia la primera ruta de /page1 a /pagina_uno.
 
 Inicia el servidor.
 
-Intenta acceder a http://localhost:3000/page1. ¿Funciona?
+Intenta acceder a http://localhost:3000/page1. ¿Funciona? 
 
 Ahora intenta acceder a http://localhost:3000/pagina_uno. ¿Funciona?
 
