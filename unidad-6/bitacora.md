@@ -195,5 +195,303 @@ De la misma manera que dejar el fondo despues de dibujar el circulo resulta en l
 #### 🎯 Enunciado
 Basado en la infraestructura de comunicación del caso de estudio vas a crear tu propia aplicación interactiva en tiempo real. Diseño algo completamente nuevo usando la misma tecnología de comunicación. ¡Sé creativo! Quiero insistirte con algo. No se trata de solo cambiar el diseño o la apariencia de la aplicación. Se trata de crear algo nuevo, diferente y original.
 
+La idea seria crear un sistema por el cual se crean ventanas de colores solidos, las cuales cambian de color en el espacio donde hacen contacto las unas con las otras, creando como ventanales que se puedan organizar de muchas maneras.
+![sketch](<Sketch idea.png>)
 
+En su primera instancia se puede ver como cada pestaña crea una sola ventana de uno de 3 colores
+![ventanas](opera_jBDIyM04T6.png)
+### server.js
+``` js
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+const path = require('path');
+
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+
+const PORT = process.env.PORT || 3000;
+
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+
+// Estado global: todas las ventanas activas
+let windows = {};
+
+
+io.on('connection', (socket) => {
+    console.log(`Cliente conectado: ${socket.id}`);
+
+
+    // Crear una ventana única para este cliente
+    const color = randomColor();
+    const win = {
+        id: socket.id,
+        x: Math.random() * 500 + 50,
+        y: Math.random() * 200 + 50,
+        w: 160 + Math.random() * 120,
+        h: 120 + Math.random() * 100,
+        color,
+    };
+
+
+    windows[socket.id] = win;
+
+
+    // Enviar todo el estado actual al nuevo cliente
+    socket.emit('init', Object.values(windows));
+
+
+    // Notificar a todos los demás sobre la nueva ventana
+    socket.broadcast.emit('add_window', win);
+
+
+    // Cuando el cliente mueve o redimensiona su ventana
+    socket.on('update_window', (data) => {
+        if (windows[socket.id]) {
+            windows[socket.id] = { ...windows[socket.id], ...data };
+            socket.broadcast.emit('update_window', windows[socket.id]);
+        }
+    });
+
+
+    socket.on('disconnect', () => {
+        console.log(`Cliente desconectado: ${socket.id}`);
+        delete windows[socket.id];
+        io.emit('remove_window', socket.id);
+    });
+});
+
+
+function randomColor() {
+    const r = Math.floor(Math.random() * 200) + 30;
+    const g = Math.floor(Math.random() * 200) + 30;
+    const b = Math.floor(Math.random() * 200) + 30;
+    return { r, g, b };
+}
+
+
+server.listen(PORT, () => {
+    console.log(`Servidor Ventanales corriendo en http://localhost:${PORT}`);
+});
+```
+### index.html
+``` js
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Ventanales — Colaborativo</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <header>
+        <h1>Ventanales Colaborativo</h1>
+        <p>Abre esta URL en varias ventanas para ver la sincronización en tiempo real.</p>
+    </header>
+    <main>
+        <canvas id="stage"></canvas>
+    </main>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
+```
+### styles.css
+``` js
+:root {
+    --bg: #111;
+    --fg: #eee;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: Inter, system-ui, Arial;
+}
+
+header {
+    padding: 10px 16px;
+    background: #0f1720;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 18px;
+}
+
+main {
+    display: flex;
+    height: calc(100% - 60px);
+}
+
+#stage {
+    flex: 1;
+    background: #222;
+    display: block;
+    cursor: move;
+}
+```
+app.js
+``` js
+const socket = io();
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight - 60;
+
+
+const windows = new Map(); // id -> ventana
+let myId = null;
+let dragging = null;
+
+
+function rgbToCss(c) { return `rgb(${c.r},${c.g},${c.b})`; }
+
+
+// Renderizado por píxel (promedio de colores en zonas de contacto)
+function render() {
+    const w = canvas.width, h = canvas.height;
+    const img = ctx.createImageData(w, h);
+    const accR = new Uint32Array(w * h);
+    const accG = new Uint32Array(w * h);
+    const accB = new Uint32Array(w * h);
+    const accC = new Uint16Array(w * h);
+
+
+    for (const win of windows.values()) {
+        const x0 = Math.max(0, Math.floor(win.x));
+        const y0 = Math.max(0, Math.floor(win.y));
+        const x1 = Math.min(w, Math.ceil(win.x + win.w));
+        const y1 = Math.min(h, Math.ceil(win.y + win.h));
+        for (let y = y0; y < y1; y++) {
+            let base = y * w;
+            for (let x = x0; x < x1; x++) {
+                const idx = base + x;
+                accR[idx] += win.color.r;
+                accG[idx] += win.color.g;
+                accB[idx] += win.color.b;
+                accC[idx]++;
+            }
+        }
+    }
+
+    const data = img.data;
+    for (let i = 0; i < w * h; i++) {
+        const c = accC[i];
+        const off = i * 4;
+        if (c === 0) {
+            data[off] = 20; data[off + 1] = 20; data[off + 2] = 24; data[off + 3] = 255;
+        } else {
+            data[off] = Math.round(accR[i] / c);
+            data[off + 1] = Math.round(accG[i] / c);
+            data[off + 2] = Math.round(accB[i] / c);
+            data[off + 3] = 255;
+        }
+    }
+
+
+    ctx.putImageData(img, 0, 0);
+
+
+    // Dibujar contornos de ventanas
+    for (const win of windows.values()) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+        ctx.strokeRect(win.x + 0.5, win.y + 0.5, win.w, win.h);
+        if (win.id === myId) {
+            ctx.strokeStyle = 'white';
+            ctx.strokeRect(win.x - 1, win.y - 1, win.w + 2, win.h + 2);
+        }
+    }
+}
+
+
+// Eventos de socket
+socket.on('connect', () => {
+    myId = socket.id;
+    console.log('Conectado:', myId);
+});
+
+
+socket.on('init', (all) => {
+    windows.clear();
+    all.forEach(w => windows.set(w.id, w));
+    render();
+});
+
+
+socket.on('add_window', (win) => {
+    windows.set(win.id, win);
+    render();
+});
+
+
+socket.on('update_window', (win) => {
+    windows.set(win.id, win);
+    render();
+});
+
+
+socket.on('remove_window', (id) => {
+    windows.delete(id);
+    render();
+});
+
+
+// Interacción local
+canvas.addEventListener('mousedown', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const myWin = windows.get(myId);
+    if (myWin && x >= myWin.x && x <= myWin.x + myWin.w && y >= myWin.y && y <= myWin.y + myWin.h) {
+        dragging = { offsetX: x - myWin.x, offsetY: y - myWin.y };
+    }
+});
+
+
+window.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const myWin = windows.get(myId);
+    if (myWin) {
+        myWin.x = x - dragging.offsetX;
+        myWin.y = y - dragging.offsetY;
+        windows.set(myId, myWin);
+        render();
+        socket.emit('update_window', { x: myWin.x, y: myWin.y });
+    }
+});
+
+
+window.addEventListener('mouseup', () => dragging = null);
+
+
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight - 60;
+    render();
+});
+```
 ## Autoevaluacion
+4.7
+Considero que hice un buen trabajo en identificar los requerimientos de cada actividad y explicando la informacion relacionada a estos de la manera mas concreta posible. (Actividad 1 y 2) 5.0
+Tambien llevo a cabo los experimentos de forma apropiada buscando identificar las causas y efectos de cada cambio y diferencia entre los diferentes procesos. (Actividad 3 y 4) 5.0
+Finalmente, se establece una idea relativamente simple donde se pueda generar interaccion entre diferentes ventanas y sus colores con una gran posibilidad de personalizacion para la cual no me da el tiempo de desarrollar mas a fondo, razon por la cual no creo merecer la maxima calificacion. 3.6
