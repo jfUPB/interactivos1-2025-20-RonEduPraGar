@@ -69,30 +69,49 @@ Cambia la primera ruta de /page1 a /pagina_uno.
 Inicia el servidor.
 
 Intenta acceder a http://localhost:3000/page1. ¿Funciona? 
+No funciona
 
 Ahora intenta acceder a http://localhost:3000/pagina_uno. ¿Funciona?
+Si funciona
 
 ¿Qué te dice esto sobre cómo el servidor asocia URLs con respuestas? Restaura el código.
+La peticion tiene que ser exactamente al mismo url indicado dentro del servidor para que este pueda establecer contacto con el cliente.
 ##### 🧐🧪✍️ Experimenta
 
 Asegúrate de que el servidor esté corriendo (npm start).
 
 Abre http://localhost:3000/page1 en una pestaña. Observa la terminal del servidor. ¿Qué mensaje ves? Anota el ID.
+A user connected - ID: V0BnVUS2e4-FTnx0AAAB
 
 Abre http://localhost:3000/page2 en OTRA pestaña. Observa la terminal. ¿Qué mensaje ves? ¿El ID es diferente?
+A user connected - ID: a8wajB4qWy2WnWsjAAAD
 
-Cierra la pestaña de page1. Observa la terminal. ¿Qué mensaje ves? ¿Coincide el ID con el que anotaste?
+Cierra la pestaña de page1. Observa la terminal. ¿Qué mensaje ves? ¿Coincide el ID con el que anotaste? Si.
+User disconnected - ID: V0BnVUS2e4-FTnx0AAAB
 
 Cierra la pestaña de page2. Observa la terminal.
+User disconnected - ID: a8wajB4qWy2WnWsjAAAD
+
 ##### 🧐🧪✍️ Experimenta
 
 Inicia el servidor y abre page1 y page2.
 
 Mueve la ventana de page1. Observa la terminal del servidor. ¿Qué evento se registra (win1update o win2update)? ¿Qué datos (Data:) ves?
 
+Received win1update from ID: 18tYtUreQmrm_tRvAAAF Data: { x: 1236, y: 568, width: 1213, height: 769 }
+Debug - Connected clients: 2, Page1: 1, Page2: 1, Synced: 2
+All clients are fully synced
+Se ve posicion en coordenadas, y el tamaño en ancho y altura de la ventana.
+
 Mueve la ventana de page2. Observa la terminal. ¿Qué evento se registra ahora? ¿Qué datos ves?
 
-Experimento clave: cambia socket.broadcast.emit(‘getdata’, page1); por socket.emit(‘getdata’, page1); (quitando broadcast). Reinicia el servidor, abre ambas páginas. Mueve page1. ¿Se actualiza la visualización en page2? ¿Por qué sí o por qué no? (Pista: ¿A quién le envía el mensaje socket.emit?). Restaura el código a broadcast.emit.
+Received win2update from ID: wNK3Ppk7BlsMOP7oAAAH Data: { x: 351, y: 616, width: 616, height: 396 }
+Se ve posicion en coordenadas, y el tamaño en ancho y altura de la ventana.
+
+Experimento clave: cambia socket.broadcast.emit(‘getdata’, page1); por socket.emit(‘getdata’, page1); (quitando broadcast). Reinicia el servidor, abre ambas páginas. Mueve page1. ¿Se actualiza la visualización en page2? ¿Por qué sí o por qué no? (Pista: ¿A quién le envía el mensaje socket.emit?). Restaura el código a broadcast.emit.)
+
+La ventana no se actualiza y pierden el intercambio de datos, la razon por la que es necesario el broadcast es que estas señales se emiten (emit) directamente al servidor normalmente, pero broadcast hace las de amplificador y permite que esta informacion sea leida por todos los miembros de la cadena.
+
 ##### 🧐🧪✍️ Experimenta
 
 Detén el servidor.
@@ -101,11 +120,13 @@ Cambia const port = 3000; a const port = 3001;.
 
 Inicia el servidor. ¿Qué mensaje ves en la consola? ¿En qué puerto dice que está escuchando?
 
-Intenta abrir http://localhost:3000/page1. ¿Funciona?
+Intenta abrir http://localhost:3000/page1. ¿Funciona? No.
 
-Intenta abrir http://localhost:3001/page1. ¿Funciona?
+Intenta abrir http://localhost:3001/page1. ¿Funciona? Si.
 
 ¿Qué aprendiste sobre la variable port y la función listen? Restaura el puerto a 3000.
+La variable port define a que espacio entre los espacios locales se le dirige a la pagina a conectarse, mientras que la funcion listen es la que permite detectar este intento de conexion o peticion de un navegador local, esta se puede cambiar, pero por defecto intenta conectarse a 3000.
+
 ## Actividad 4
 ### Explorando los clientes (p5.js + Socket.IO)
 #### 🎯 Enunciado
@@ -119,8 +140,15 @@ Abre la consola de desarrollador (F12).
 Detén el servidor Node.js (Ctrl+C).
 
 Refresca la página page2.html. Observa la consola del navegador. ¿Ves algún error relacionado con la conexión? ¿Qué indica?
+manager.js:108 
+            
+            
+           GET http://localhost:3000/socket.io/?EIO=4&transport=polling&t=PeNasoK net::ERR_CONNECTION_REFUSED
+        
+La conexion no logra obtener el paquete que recibiria del servidor.
 
 Vuelve a iniciar el servidor y refresca la página. ¿Desaparecen los errores?
+Si
 ##### 🧐🧪✍️ Experimenta
 
 Comenta la línea socket.emit(‘win2update’, currentPageData, socket.id); dentro del listener connect.
@@ -130,24 +158,39 @@ Reinicia el servidor y refresca page1.html y page2.html.
 Mueve la ventana de page2 un poco para que envíe una actualización.
 
 ¿Qué pasó? ¿Por qué?
+
+No se sincronizan los datos, esto debido a que la pagina 2 no esta enviando los datos que definen su posicion y su funcionamiento dentro del servidor, esencialmente no esta mandando nada.
+
 ##### 🧐🧪✍️ Experimenta
 
 Abre ambas páginas (es posible que ya las tengas abiertas).
 
 Mueve la ventana de page1. Observa la consola del navegador de page2. ¿Qué datos muestra?
 
+Received valid remote data: {x: 416, y: 563, width: 150, height: 396}
+Los datos de la otra pagina
+
 Mueve la ventana de page2. Observa la consola de page1. ¿Qué pasa? ¿Por qué?
+
+Recibe los datos de la otra pagina y muestra cuales son, una forma efectiva de identificar que la conexion funciona correctamente, ademas de que es lo que define como se conecta la cuerda de las esferas.
+
 ##### 🧐🧪✍️ Experimenta
 
 Observa checkWindowPosition() en page2.js y modifica el código del if para comprobar si el código dentreo de este se ejecuta.
 Mueve cada ventana y observa las consolas.
+![Comprobacion posicion](opera_vSEExE9TX2.png)
 ¿Qué puedes concluir y por qué?
+Esta funcion existe con tal de generar un recordatorio de la posicion de la ventana en el sistema, con tal de que la conexion no tenga errores debido a una perdida de informacion, asi que es algo que corre a la vez del envio de la informacion al resto del sistema.
+
 ##### 🧐🧪✍️ Experimenta
 (¡Sé creativo!)
 
 Cambia el background(220) para que dependa de la distancia entre las ventanas. Puedes calcular la magnitud del resultingVector usando let distancia = resultingVector.mag(); y luego usa map() para convertir esa distancia a un valor de gris o color. background(map(distancia, 0, 1000, 255, 0)); (ajusta el rango 0-1000 según sea necesario).
-
+![Cambio color fondo](opera_lnikIZIwMa.png)
 Inventa otra modificación creativa.
+De la misma manera que dejar el fondo despues de dibujar el circulo resulta en la desaparicion de este ultimo, podemos mover su funcion de dibujo adelante para que vuelva a funcionar y luego se puede hacer uso de los mismos comandos de linea y dibujo de circulo para crear nuevos circulos con conexiones entre ellos con base en la distancia.
+![conexion incompleta](JaNfQC1w5A.png)
+ esto se puede extender a la pagina 1 para que se vea la imagen completa, o se puede representar otros objetos por medio de la posible posicion de esa linea, ademas de la posibilidad de recrear varias formas o cambiar el tamaño de los nodos (circulos) para que estos representen solo la figura que se forme por medio de lineas.
 ## Actividad 5
 #### 🎯 Enunciado
 Basado en la infraestructura de comunicación del caso de estudio vas a crear tu propia aplicación interactiva en tiempo real. Diseño algo completamente nuevo usando la misma tecnología de comunicación. ¡Sé creativo! Quiero insistirte con algo. No se trata de solo cambiar el diseño o la apariencia de la aplicación. Se trata de crear algo nuevo, diferente y original.
