@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualizador - Cliente Móvil</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #111;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h3 style="position:absolute; top:10px; left:0; right:0; text-shadow:0 0 5px black;">
+    📱 Cliente Móvil - Visualizador
+  </h3>
+
+  <canvas></canvas>
+
+  <!-- Cliente Socket.IO -->
+  <script src="/socket.io/socket.io.js"></script>
+
+  <!-- Script del cliente móvil -->
+  <script src="./sketch.js"></script>
+</body>
+</html>
